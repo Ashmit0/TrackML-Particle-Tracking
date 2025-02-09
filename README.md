@@ -19,7 +19,4 @@ pip install -r requirements.txt
 ```
 
 
-## To install the necessary libraries 
-
-
 ## Install Data Locally on your device : 
