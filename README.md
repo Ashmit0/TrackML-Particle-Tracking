@@ -1,4 +1,4 @@
-# TrackML-Particle_Tracking
+# TrackML-Particle-Tracking
 
 ## Setting Up the Virtual Environment: 
 If you are on a mac, make sure to install python version 3.10 on your computer and follow the steps bellow on terminal: 
