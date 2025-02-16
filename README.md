@@ -24,4 +24,4 @@ pip install -e .
 
 ## Install Data Locally on your device: 
 
-In the source folder of the project created a directory `data` and download the required datasets from [Kaggle.](https://www.kaggle.com/competitions/trackml-particle-identification/data?select=train_5.zip)
+In the source folder of the project create a directory `data` and download the required datasets from [Kaggle.](https://www.kaggle.com/competitions/trackml-particle-identification/data?select=train_5.zip)
