@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# pickel files : 
+.pickle
+
 # C extensions
 *.so
 
