@@ -1,0 +1,30 @@
+# Hyperparameters for the Embedding Part 
+# of the architecture
+
+# Dataset Paths: 
+detector_path: '../data/detectors.csv'
+dataset_path: '../data/train_100_events/'
+
+# Preprocessing 
+min_hits : 3 
+
+# DataLoders
+shuffle : True 
+valid_size : 0.1 
+test_size : 0.1 
+num_works : 8
+
+# Embedding Model 
+in_featuers: 15 
+hidden_featuers: [1024,512,256,128,64,32,16]
+out_featuers: 5
+
+# Latent Space Graph 
+margin : 0.1 
+max_num_neighbours : 100 
+
+# Traning 
+lr : 0.01 
+save_model :  True 
+save_model_path : '../data/models/embedding_model.pt'
+
