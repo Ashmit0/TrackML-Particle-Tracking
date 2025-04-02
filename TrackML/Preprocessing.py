@@ -241,8 +241,7 @@ def get_track_index_pairs(particle_ids:torch.tensor)->torch.tensor:
             col.extend( indices[col_idx].tolist() )
     
     # create tensors for row and column : 
-    row , col = torch.tensor(row).unsqueeze(dim=0) , torch.tensor(col).unsqueeze(dim=0) 
-    
+    row , col = torch.tensor(row , device = particle_ids.device , dtype = torch.int64 ).unsqueeze(dim=0  ) , torch.tensor(col , device = particle_ids.device , dtype = torch.int64).unsqueeze(dim=0) 
     # concatinate to make a edge_index type tensor object : 
     return torch.concatenate((row,col),dim=0) 
     
