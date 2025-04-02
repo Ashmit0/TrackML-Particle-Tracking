@@ -139,7 +139,7 @@ def EmbeddingLossFunction(
         dim = -1 
     )
     
-    del pcol , ncol , prow , ncol , x 
+    del pcol , ncol , prow , nrow , x 
     
     foo1 = (margin - loss_minus).sum()
     foo2 = loss_plus.sum()
