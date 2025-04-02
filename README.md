@@ -1,16 +1,15 @@
 # TrackML-Particle-Tracking
 
 ## Setting Up the Virtual Environment: 
-If you are on a mac, make sure to install python version 3.10 on your computer and follow the steps bellow on terminal: 
+Follow the steps bellow to set up the virtual environment for the project. 
 
 ```sh
-python3.10 -m pip install virtualenv
-python3.10 -m venv <environment name>
-source <environment name>/bin/activate
+conda create --name TrackMLEnv python=3.10.8 
+conda activate TrackMLEnv
 ```
 to deactivate the evironment simply type 'deactivate' in the terminal 
 ```sh
-deactivate
+conda deactivate
 ```
 
 Once inside the virtual environment the next line in the terminal will install all the necessary libraries required for the project: 
@@ -24,4 +23,17 @@ pip install -e .
 
 ## Install Data Locally on your device: 
 
-In the source folder of the project create a directory `data` and download the required datasets from [Kaggle.](https://www.kaggle.com/competitions/trackml-particle-identification/data?select=train_5.zip)
+Once the libraries are installed [authenticate](https://www.kaggle.com/docs/api) the kaggle api use the terminal comands to install the data locally on your device
+
+to create a data folder 
+```sh
+mkdir data
+```
+to install specific files: 
+```sh
+kaggle competitions download -c trackml-particle-identification -f detectors.zip -p data/ 
+```
+or to install all available files: 
+```sh
+kaggle competitions download -c trackml-particle-identification -p data/
+```
