@@ -70,7 +70,7 @@ class EmbeddingBase(LightningModule):
         self.log('Loss' , loss, prog_bar = True , on_step = True , on_epoch = False )
         self.log_sum_loss.update(loss)
         self.log(
-            'Log Loss' , self.log_sum_loss.compute(), on_step = False , 
+            'Log Loss' , self.log_sum_loss.compute(), on_step = True , 
             on_epoch = True , prog_bar = True , reduce_fx = 'max' 
         )
         
@@ -113,7 +113,7 @@ class EmbeddingBase(LightningModule):
             self.log_sum_loss.update(loss)
             self.log(
                 'Log Loss' , self.log_sum_loss.compute(), 
-                on_step = False , on_epoch = True , 
+                on_step = True , on_epoch = True , 
                 prog_bar = True , reduce_fx = 'max' 
             )
             

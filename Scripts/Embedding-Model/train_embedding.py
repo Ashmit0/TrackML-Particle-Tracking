@@ -43,7 +43,7 @@ if __name__ == "__main__":
         accelerator = "auto", 
         devices = 1,
         # fast_dev_run = 2, 
-        max_epochs=200,
+        max_epochs=100,
         # limit_train_batches=2,    # Use a small number of batches
         # limit_val_batches=2,
         enable_checkpointing=True, 

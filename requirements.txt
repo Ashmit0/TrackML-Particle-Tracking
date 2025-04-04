@@ -23,4 +23,7 @@ torch-geometric
 lightning
 torchmetrics
 PyYAML
-kaggle     
+kaggle
+lightning[extra]
+tensorboard
+tensorboardX     
