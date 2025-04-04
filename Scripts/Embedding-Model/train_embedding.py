@@ -5,9 +5,12 @@ if __name__ == "__main__":
     # pytorch lightning 
     from pytorch_lightning import Trainer
     from pytorch_lightning.callbacks import ModelCheckpoint,RichProgressBar
+    from pytorch_lightning.loggers import TensorBoardLogger
     # TrackML Packages 
     from TrackML.Embedding.base import EmbeddingBase
     from TrackML.Embedding.dataset import EmbeddingDataset
+
+    torch.cuda.empty_cache()
 
     torch.set_float32_matmul_precision('high')
     
@@ -27,25 +30,26 @@ if __name__ == "__main__":
         every_n_train_steps = 0,
         every_n_epochs = 1
     )
+    
+    # Initialize TensorBoard logger
+    logger = TensorBoardLogger("lightning_logs", name="Embedding_Model")
 
     model = EmbeddingBase(hparams)
     ds = EmbeddingDataset(hparams)
 
 
     trainer = Trainer(
-        logger  = True , 
+        logger  = logger , 
         accelerator = "auto", 
         devices = 1,
         # fast_dev_run = 2, 
-        max_epochs=1,
-        limit_train_batches=4,    # Use a small number of batches
-        limit_val_batches=4,
+        max_epochs=200,
+        # limit_train_batches=2,    # Use a small number of batches
+        # limit_val_batches=2,
         enable_checkpointing=True, 
         callbacks=[checkpoint_callback,RichProgressBar()], 
-        log_every_n_steps=1,
+        log_every_n_steps=20,
         enable_progress_bar=True 
     )
 
     trainer.fit(model , ds )
-
-    
