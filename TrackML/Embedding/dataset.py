@@ -16,16 +16,19 @@ class EmbeddingDataset(pl.LightningDataModule):
         super().__init__() 
         self.save_hyperparameters(hparams)
         
-    def prepare_data(self)->None: 
-        self.detector = Preprocessing.load_detector_data(self.hparams['detector_path'])
+    # def prepare_data(self)->None: 
+        # self.detector = Preprocessing.load_detector_data(self.hparams['detector_path'])
         # get the list of event ids from the dataset folder : 
-        self.eventids = [ code[:-9] for code in os.listdir(self.hparams['dataset_path']) if code.endswith('-hits.csv') ]
-        dataset = PointCloudData(dataset_path=self.hparams['dataset_path'] , detector_path=self.hparams['detector_path'] , min_nhits=self.hparams['min_hits'] )
+        # self.eventids = [ code[:-9] for code in os.listdir(self.hparams['dataset_path']) if code.endswith('-hits.csv') ]
+        # self.dataset = PointCloudData(dataset_path=self.hparams['dataset_path'] , detector_path=self.hparams['detector_path'] , min_nhits=self.hparams['min_hits'] )
+    
+    def setup(self,stage=None)->None: 
+        self.dataset = PointCloudData(dataset_path=self.hparams['dataset_path'] , detector_path=self.hparams['detector_path'] , min_nhits=self.hparams['min_hits'] )
         self.train_ds , self.val_ds , self.test_ds = train_test_split(
-            dataset=dataset, valid_size=self.hparams['valid_size'], 
+            dataset=self.dataset, valid_size=self.hparams['valid_size'], 
             test_size=self.hparams['test_size'], num_works=self.hparams['num_works']
         )
-    
+        
     def train_dataloader(self): 
         return self.train_ds 
     def val_dataloader(self): 

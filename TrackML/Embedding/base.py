@@ -76,7 +76,7 @@ class EmbeddingBase(LightningModule):
         
         if device == torch.device('cuda'): 
             self.log(
-                'Memory Allocated' , torch.cuda.current_allocated_memory()/(1024**3), 
+                'Memory Allocated' , torch.cuda.memory_allocated()/(1024**3), 
                 prog_bar=True , on_step = True , on_epoch=True, 
                 reduce_fx='max'
             )
@@ -130,7 +130,7 @@ class EmbeddingBase(LightningModule):
             )
             if device == torch.device('cuda'): 
                 self.log(
-                    'Memory Allocated' , torch.cuda.current_allocated_memory()/(1024**3), 
+                    'Memory Allocated' , torch.cuda.memory_allocated()/(1024**3), 
                     prog_bar=True , on_step = True , on_epoch=True, 
                     reduce_fx='max'
                 )
@@ -139,6 +139,10 @@ class EmbeddingBase(LightningModule):
     
     def validation_step(self,batch,batch_idx):
         return self._test_val_common_step_(batch,batch_idx)
+    
+    def on_validation_epoch_end(self):
+        self.track_purity.reset()
+        self.particle_purity.reset()
     
     def test_step(self,batch,batch_idx): 
         return self._test_val_common_step_(batch,batch_idx)
