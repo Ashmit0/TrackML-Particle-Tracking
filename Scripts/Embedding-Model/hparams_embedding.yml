@@ -16,7 +16,7 @@ num_works : 8
 
 # Embedding Model 
 in_featuers: 15 
-hidden_featuers: [1024,512,256,128,64,32,16]
+hidden_featuers: [64,32,16]
 out_featuers: 5
 
 # Latent Space Graph 
@@ -26,4 +26,5 @@ max_num_neighbours : 100
 # Traning 
 lr : 0.01 
 save_model :  True 
-save_model_path : '/scratch/work/ashmitb21/data/models/'
+save_model_path : '/scratch/work/ashmitb21/data/models/Embedding'
+save_checkpoint_path : '/scratch/work/ashmitb21/data/models/Embedding/checkpoint'

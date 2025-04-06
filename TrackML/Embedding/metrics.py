@@ -3,20 +3,24 @@ import torch
 # torchmetrics 
 from torchmetrics import Metric
 
-### define custom log loss metric for pytorch lightning : 
-def _custom_dist_reduce_fn(x): 
-    return torch.log( torch.sum( x , dim = 0 ) )
 
 class LogSumLoss(Metric):
     def __init__(self):
         super().__init__()
-        self.add_state("log_loss_sum", default=torch.tensor(0.0), dist_reduce_fx=_custom_dist_reduce_fn)
+        self.add_state("log_losses", default=torch.tensor([]), dist_reduce_fx="cat")
 
     def update(self, loss):
-        self.log_loss_sum = torch.log(loss) + torch.log( 1 + torch.exp(self.log_loss_sum)/loss)
+        # Expect loss to be a tensor of shape (N,) or scalar
+        loss = loss.flatten().detach()
+        self.log_losses = torch.cat([self.log_losses, torch.log(loss)])
 
     def compute(self):
-        return self.log_loss_sum
+        # log-sum-exp: log(sum(exp(x))) = max + log(sum(exp(x - max)))
+        if self.log_losses.numel() == 0:
+            return torch.tensor(float("-inf"), device=self.log_losses.device)
+
+        max_log = torch.max(self.log_losses)
+        return max_log + torch.log(torch.sum(torch.exp(self.log_losses - max_log)))
 
   
 ### define the purity metric class for 
@@ -25,19 +29,21 @@ class Purity(Metric):
     def __init__(self): 
         super().__init__()
         self.add_state(
-            'intersections', 
-            default = torch.tensor([]), 
-            dist_reduce_fx = 'cat'
+            'purity', 
+            default = torch.tensor(0.0), 
+            dist_reduce_fx = 'sum'
         )
         self.add_state(
-            'num_hits', 
-            default = torch.tensor([]),
-            dist_reduce_fx = 'cat'
+            'num_events', 
+            default = torch.tensor(0.0),
+            dist_reduce_fx = 'sum'
         )
         
-    def update(self,intersections,num_hits):
-        self.intersections = intersections
-        self.num_hits = num_hits
-    
-    def compute(self): 
-        return torch.mean( self.intersections/self.num_hits )
+    def update(self, intersections, num_hits):
+        # Ensure tensors are 1D
+        self.purity += torch.mean( intersections/num_hits ).to(self.purity.device)
+        self.num_events += 1 
+
+    def compute(self):
+        # Standard purity: sum of max class counts / total number of samples
+        return self.purity/self.num_events

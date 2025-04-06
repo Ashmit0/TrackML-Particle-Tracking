@@ -9,6 +9,8 @@ if __name__ == "__main__":
     # TrackML Packages 
     from TrackML.Embedding.base import EmbeddingBase
     from TrackML.Embedding.dataset import EmbeddingDataset
+    
+    print("PID:", os.getpid())
 
     torch.cuda.empty_cache()
 
@@ -28,9 +30,18 @@ if __name__ == "__main__":
         mode="min",  # "min" for loss, "max" for accuracy or other metrics
         verbose=True,
         every_n_train_steps = 0,
-        every_n_epochs = 1
+        every_n_epochs = 1, 
+        save_weights_only=True 
     )
     
+    
+    checkpoint_callback2 = ModelCheckpoint(
+        dirpath=hparams['save_checkpoint_path'],
+        filename="{epoch}-{step}",  # Include epoch and step in the filename
+        save_top_k=-1,
+        every_n_train_steps=10,
+        save_weights_only=False,
+    )
     # Initialize TensorBoard logger
     logger = TensorBoardLogger("lightning_logs", name="Embedding_Model")
 
@@ -41,14 +52,14 @@ if __name__ == "__main__":
     trainer = Trainer(
         logger  = logger , 
         accelerator = "auto", 
-        devices = 1,
+        devices = 2,
         # fast_dev_run = 2, 
-        max_epochs=100,
+        max_epochs=50,
         # limit_train_batches=2,    # Use a small number of batches
         # limit_val_batches=2,
         enable_checkpointing=True, 
-        callbacks=[checkpoint_callback,RichProgressBar()], 
-        log_every_n_steps=20,
+        callbacks=[checkpoint_callback,RichProgressBar(),checkpoint_callback2], 
+        log_every_n_steps=10,
         enable_progress_bar=True 
     )
 

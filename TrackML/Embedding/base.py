@@ -28,10 +28,10 @@ class EmbeddingBase(LightningModule):
         self.save_hyperparameters(hparams)
         
         # loss accumulation metric : 
-        self.log_sum_loss = LogSumLoss()
+        self.log_sum_loss = LogSumLoss().to(self.device)
         # track and particle purity : 
-        self.particle_purity = Purity() 
-        self.track_purity = Purity()
+        self.particle_purity = Purity().to(self.device)
+        self.track_purity = Purity().to(self.device)
         
         # save the model descriptions : 
         self.model = EmbeddingModel(
@@ -67,21 +67,30 @@ class EmbeddingBase(LightningModule):
             margin=self.hparams['margin']
         )
         
-        self.log('Loss' , loss, prog_bar = True , on_step = True , on_epoch = False )
+        # self.log('Loss' , loss, prog_bar = True , on_step = True , on_epoch = False )
         self.log_sum_loss.update(loss)
         self.log(
             'Log Loss' , self.log_sum_loss.compute(), on_step = True , 
-            on_epoch = True , prog_bar = True , reduce_fx = 'max' 
+            on_epoch = True , prog_bar = True , reduce_fx = 'max' , sync_dist=True
         )
         
         if device == torch.device('cuda'): 
             self.log(
                 'Memory Allocated' , torch.cuda.memory_allocated()/(1024**3), 
                 prog_bar=True , on_step = True , on_epoch=True, 
-                reduce_fx='max'
+                reduce_fx='max' , sync_dist=True
             )
         
         return loss 
+    
+    def on_train_batch_end(self, outputs, batch, batch_idx):
+    # Clear memory every 50 steps
+        if batch_idx % 10 == 0:
+            torch.cuda.empty_cache()
+            torch.cuda.ipc_collect()  # extra cleanup for inter-process memory
+
+            # Optional logging
+            self.log("Memory Cleared (step)", batch_idx, prog_bar=False, logger=True)
     
     # common logic for test and validation 
     def _test_val_common_step_(self , batch , batch_idx ): 
@@ -106,15 +115,15 @@ class EmbeddingBase(LightningModule):
                 radius_graph_edge_index=radius_graph_edge_index, 
                 margin=self.hparams['margin']
             )
-            self.log(
-                'Loss',loss, prog_bar = True , 
-                on_step = True , on_epoch = False 
-            )
+            # self.log(
+            #     'Loss',loss, prog_bar = True , 
+            #     on_step = True , on_epoch = False 
+            # )
             self.log_sum_loss.update(loss)
             self.log(
                 'Log Loss' , self.log_sum_loss.compute(), 
                 on_step = True , on_epoch = True , 
-                prog_bar = True , reduce_fx = 'max' 
+                prog_bar = True , reduce_fx = 'max' , sync_dist=True
             )
             
             # create the graph data structure : 
@@ -126,16 +135,25 @@ class EmbeddingBase(LightningModule):
             
             self.log_dict(
                 {'track purity' : self.track_purity.compute() , 'particle purity' : self.particle_purity.compute() }, 
-                on_step = True , on_epoch = True , prog_bar = True , reduce_fx = 'mean'
+                on_step = True , on_epoch = True , prog_bar = True , reduce_fx = 'mean' , sync_dist=True
             )
             if device == torch.device('cuda'): 
                 self.log(
                     'Memory Allocated' , torch.cuda.memory_allocated()/(1024**3), 
                     prog_bar=True , on_step = True , on_epoch=True, 
-                    reduce_fx='max'
+                    reduce_fx='max' , sync_dist=True
                 )
             
         return loss
+    
+    def on_validation_batch_end(self , outputs, batch, batch_idx, dataloader_idx=0): 
+        if batch_idx % 10 == 0:
+            torch.cuda.empty_cache()
+            torch.cuda.ipc_collect()  # extra cleanup for inter-process memory
+
+            # Optional logging
+            self.log("Memory Cleared (step)", batch_idx, prog_bar=False , logger = True )
+    
     
     def validation_step(self,batch,batch_idx):
         return self._test_val_common_step_(batch,batch_idx)
@@ -143,6 +161,14 @@ class EmbeddingBase(LightningModule):
     def on_validation_epoch_end(self):
         self.track_purity.reset()
         self.particle_purity.reset()
+        
+        # # Clear memory every 50 steps
+        # if batch_idx % 10 == 0:
+        #     torch.cuda.empty_cache()
+        #     torch.cuda.ipc_collect()  # extra cleanup for inter-process memory
+
+        #     # Optional logging
+        #     self.log("Memory Cleared (step)", batch_idx, prog_bar=False, logger=True)
     
     def test_step(self,batch,batch_idx): 
         return self._test_val_common_step_(batch,batch_idx)
