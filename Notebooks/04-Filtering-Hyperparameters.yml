@@ -1,0 +1,24 @@
+# dataset  : 
+dataset_path : '../data/train_100_events/'
+detector_path: '../data/detectors.csv'
+embd_model_path :  '../data/models/Embedding-Model-v7.ckpt'
+
+# graph  
+min_nhits : 3 
+margin : 0.1 
+max_num_neighbours : 100 
+
+# model  
+in_featuers: 15 
+hidden_features : [20,10,5]
+
+# dataloders 
+valid_size : 0.1 
+test_size : 0.1 
+
+
+# training
+num_works : 0 
+lr : 0.01 
+save_model :  True 
+save_model_path : '../data/models/Fitering-Model'
