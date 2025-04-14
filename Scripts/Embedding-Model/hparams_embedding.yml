@@ -5,6 +5,10 @@
 detector_path: '/scratch/work/ashmitb21/data/detectors.csv'
 dataset_path: '/scratch/work/ashmitb21/data/train_1/'
 
+# filtering: 
+max_r : 600 
+drop_fake : True 
+
 # Preprocessing 
 min_hits : 3 
 
