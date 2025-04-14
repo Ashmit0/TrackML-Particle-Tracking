@@ -244,4 +244,13 @@ def get_track_index_pairs(particle_ids:torch.tensor)->torch.tensor:
     row , col = torch.tensor(row , device = particle_ids.device , dtype = torch.int64 ).unsqueeze(dim=0  ) , torch.tensor(col , device = particle_ids.device , dtype = torch.int64).unsqueeze(dim=0) 
     # concatinate to make a edge_index type tensor object : 
     return torch.concatenate((row,col),dim=0) 
+
+
+def filter_hits( processed_hits:torch.tensor, labels:torch.tensor, max_r:float=800, drop_fake:bool=False ): 
+    rho = torch.hypot(processed_hits[:,0] , processed_hits[:,3] )
+    mask = rho < max_r 
     
+    if drop_fake : 
+        mask = mask | ( labels != 0 )
+    
+    return processed_hits[ mask , : ] , labels[ mask ]

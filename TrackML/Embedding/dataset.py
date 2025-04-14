@@ -23,7 +23,7 @@ class EmbeddingDataset(pl.LightningDataModule):
         # self.dataset = PointCloudData(dataset_path=self.hparams['dataset_path'] , detector_path=self.hparams['detector_path'] , min_nhits=self.hparams['min_hits'] )
     
     def setup(self,stage=None)->None: 
-        self.dataset = PointCloudData(dataset_path=self.hparams['dataset_path'] , detector_path=self.hparams['detector_path'] , min_nhits=self.hparams['min_hits'] )
+        self.dataset = PointCloudData(dataset_path=self.hparams['dataset_path'] , detector_path=self.hparams['detector_path'] , min_nhits=self.hparams['min_hits'] , max_r = self.hparams['max_r'] , drop_fake= self.hparams['drop_fake'] )
         self.train_ds , self.val_ds , self.test_ds = train_test_split(
             dataset=self.dataset, valid_size=self.hparams['valid_size'], 
             test_size=self.hparams['test_size'], num_works=self.hparams['num_works']

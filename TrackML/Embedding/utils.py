@@ -23,7 +23,7 @@ from TrackML.Models.utils import buildMLP
 class PointCloudData(data.Dataset): 
     
     # initialize the dataset class : 
-    def __init__(self,dataset_path:str,detector_path:str,min_nhits=3)->None:
+    def __init__(self,dataset_path:str,detector_path:str,min_nhits=3,max_r:float=800,drop_fake=True)->None:
         '''
         dataset_path : path to the dataset with the events. 
         eventids : list of eventid identifiers. 
@@ -37,13 +37,16 @@ class PointCloudData(data.Dataset):
         
         # get the list of event ids from the dataset folder : 
         eventids = [ code[:-9] for code in os.listdir(dataset_path) if code.endswith('-hits.csv') ]
-        self.eventids = eventids    
+        self.eventids = eventids
+        
+        self.max_r = max_r    
+        self.drop_fake = drop_fake
         
     def __len__(self)->int: 
         return len( self.eventids )
     
     def __getitem__(self, index):
-        return (
+        node_data , labels =  (
             Preprocessing.process_event_data(
                 train_path=self.dataset_path, 
                 eventid=self.eventids[index], 
@@ -55,6 +58,7 @@ class PointCloudData(data.Dataset):
                 min_nhits=self.min_nhits 
             )
         )
+        return Preprocessing.filter_hits(node_data,labels,self.max_r,self.drop_fake)
         
         
 ### def collate function for the dataloder : 
