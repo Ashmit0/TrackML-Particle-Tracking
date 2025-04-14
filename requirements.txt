@@ -26,4 +26,6 @@ PyYAML
 kaggle
 lightning[extra]
 tensorboard
-tensorboardX     
+tensorboardX
+hyppo     
+future 
