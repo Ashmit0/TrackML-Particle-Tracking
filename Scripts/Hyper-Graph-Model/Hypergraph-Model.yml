@@ -1,0 +1,42 @@
+# Hyperparameters for the Embedding Part 
+# of the architecture
+
+# Dataset Paths: 
+detector_path: '../data/detectors.csv'
+dataset_path: '../data/train_100_events/'
+
+# filtering: 
+max_r : 200 
+drop_fake : True 
+
+# Preprocessing 
+min_hits : 3 
+
+# DataLoders
+shuffle : True 
+valid_size : 0.2
+test_size : 0.1 
+num_works : 0
+
+# Node Embedding MLP 
+node_insize : 15
+node_features : [64]
+node_outsize : 5
+
+# hyperedge feature embedding MLP 
+hpr_edge_outsize : 5
+hpr_edge_features : [64]
+
+# Convolutional Model
+hg_outsize : 5
+hg_features : [32,10]
+
+# Latent Space Graph 
+margin : 0.1 
+max_num_neighbours : 100 
+
+# Traning 
+lr : 0.01 
+save_model :  True 
+save_model_path : '../data/models/embedding_model.pt'
+save_checkpoint_path : '../data/models/embedding_model_checkpoint.pt'
